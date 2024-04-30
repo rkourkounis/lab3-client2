@@ -1,0 +1,27 @@
+services:
+  keycloak:
+    image: delveccj/keycloak:1.3
+    ports:
+      - "8443:8443"
+    command:
+      - "start-dev --health-enabled=true"
+    healthcheck:
+      test: ["CMD", "java", "-jar", "/opt/keycloak/bin/keycloak-1.0.jar"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+  keycloak-endpoint:
+    image: delveccj/keycloak-auth-endpoint:1.3
+    depends_on:
+      keycloak:
+         condition: service_healthy
+    network_mode: "host"
+  ssl-endpoint:
+    image: delveccj/ssl-endpoint:1.3
+    ports:
+      - "8081:8081"
+  basic-endpoint:
+    image: delveccj/basic-auth-endpoint:1.3
+    ports:
+      - "8080:8080"
+
